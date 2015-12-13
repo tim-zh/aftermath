@@ -1,5 +1,8 @@
 package aftermath
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.io.Source
 
 object Main extends App {
@@ -41,8 +44,21 @@ object Main extends App {
 			if (neighborCounters(i) < densityThreshold)
 				outliers :+= strings(i)
 		}
-		outliers
+		outliers.distinct
 	}
 
-	findOutliers(getStrings(args(0)), Integer.valueOf(args(1)), Integer.valueOf(args(2)))
+	def parallelFindOutliers(strings: Seq[String], filter: Seq[String] => Seq[String], parallelBlockSize: Int): Future[Seq[String]] = {
+		Future.traverse(strings.grouped(parallelBlockSize)) { block =>
+			Future(filter(block))
+		}.map(_.reduce(_ ++ _).distinct)
+	}
+
+	Await.result(
+		parallelFindOutliers(
+			getStrings(args(0)),
+			findOutliers(_, Integer.valueOf(args(1)), Integer.valueOf(args(2))),
+			Integer.valueOf(args(3))
+		),
+		Duration.Inf
+	)
 }

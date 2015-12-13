@@ -2,6 +2,9 @@ package aftermath
 
 import org.scalatest.{Matchers, FlatSpec}
 
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
 class MainSpec extends FlatSpec with Matchers {
 	"Main" should "calculate precise distance between strings" in {
 		Main.strongDistanceBetween("123abc", "123abc") should be(0)
@@ -17,8 +20,15 @@ class MainSpec extends FlatSpec with Matchers {
 		result1.head should be("aab")
 
 		val result2 = Main.findOutliers(strings, 1, 3)
-		result2.size should be(2)
+		result2.size should be(1)
 		result2.head should be("bbb")
-		result2.tail.head should be("bbb")
+	}
+
+	it should "find outlying strings in parallel" in {
+		val strings = Seq("aaa", "aaa", "aab", "bbb", "bbb", "aaa", "aaa", "aab", "bbb", "bbb")
+
+		val result = Await.result(Main.parallelFindOutliers(strings, Main.findOutliers(_, 0, 2), 5), Duration.Inf)
+		result.size should be(1)
+		result.head should be("aab")
 	}
 }
