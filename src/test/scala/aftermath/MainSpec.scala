@@ -3,10 +3,10 @@ package aftermath
 import org.scalatest.{Matchers, FlatSpec}
 
 class MainSpec extends FlatSpec with Matchers {
-	"Main" should "calculaate distance between strings" in {
-		Main.levenshteinDistanceBetween("123abc", "123abc") should be(0)
-		Main.levenshteinDistanceBetween("321abc", "123abc") should be(2)
-		Main.levenshteinDistanceBetween("123", "123abc") should be(3)
+	"Main" should "calculate precise distance between strings" in {
+		Main.strongDistanceBetween("123abc", "123abc") should be(0)
+		Main.strongDistanceBetween("321abc", "123abc") should be(2)
+		Main.strongDistanceBetween("123", "123abc") should be(3)
 	}
 
 	it should "find outlying strings" in {
