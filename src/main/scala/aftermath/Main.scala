@@ -60,5 +60,5 @@ object Main extends App {
 			Integer.valueOf(args(3))
 		),
 		Duration.Inf
-	)
+	) foreach println
 }
